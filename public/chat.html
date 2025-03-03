@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>XAI Playground - Chat</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #chat { border: 1px solid #ccc; padding: 10px; min-height: 200px; }
+        #message { width: 80%; padding: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Chat as <span id="character"></span></h1>
+    <div id="chat"></div>
+    <form id="messageForm">
+        <input type="text" id="message" placeholder="Type your message...">
+        <button type="submit">Send</button>
+    </form>
+
+    <script>
+        // Get name and character from URL query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const name = urlParams.get('name') || 'Unknown';
+        const character = urlParams.get('character') || 'Padawan';
+
+        // Display the character name
+        document.getElementById('character').textContent = character;
+
+        const form = document.getElementById('messageForm');
+        const chat = document.getElementById('chat');
+        
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const message = document.getElementById('message').value;
+            
+            chat.innerHTML += `<p>You: ${message}</p>`;
+            
+            const response = await fetch('/message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `name=${encodeURIComponent(name)}&message=${encodeURIComponent(message)}&character=${encodeURIComponent(character)}`
+            });
+            
+            const data = await response.json();
+            if (data.error) {
+                chat.innerHTML += `<p style="color: red">${data.error}</p>`;
+            } else {
+                chat.innerHTML += `<p>${character}: ${data.response}</p>`;
+            }
+            
+            document.getElementById('message').value = '';
+            chat.scrollTop = chat.scrollHeight;
+        };
+    </script>
+</body>
+</html>
