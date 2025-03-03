@@ -72,7 +72,7 @@ app.post('/message', async (req, res) => {
         });
 
         console.log('Generated Text:', text);
-        res.json({ response: `Greetings, I am ${character}. ${text}` });
+        res.json({ response: `${text}` });
     } catch (error) {
         console.error('xAI API Error:', error);
         res.json({ error: 'Something went wrong with the AI response' });
